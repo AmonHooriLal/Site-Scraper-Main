@@ -2,7 +2,7 @@
 
 ## 0.1.0 (beta), 2026-10-30
 
-First public release.
+First public release. Requires Python 3.10 or newer.
 
 - Finds pages from sitemaps (indexes and `.gz` included), RSS/Atom feeds, links, pagination and language versions.
 - Fetches with 8 parallel workers and a polite rate limit per host. Honours robots.txt and `Crawl-delay`.

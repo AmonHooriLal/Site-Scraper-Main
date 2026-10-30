@@ -9,7 +9,7 @@ description = "Paste a website URL and save its public content as JSON, Markdown
 readme = "README.md"
 license = { text = "MIT" }
 authors = [{ name = "Amon" }]
-requires-python = ">=3.9"
+requires-python = ">=3.10"
 keywords = ["web scraping", "crawler", "sitemap", "markdown", "excel", "playwright"]
 classifiers = [
     "Development Status :: 4 - Beta",
@@ -34,7 +34,7 @@ full = [
     "phonenumbers>=8.13",
     "playwright>=1.40",
     "rich>=13.0",
-    "truststore>=0.8; python_version >= '3.10'",
+    "truststore>=0.8",
 ]
 dev = ["pytest>=7", "ruff>=0.4"]
 
@@ -49,7 +49,7 @@ packages = ["site_scraper"]
 
 [tool.ruff]
 line-length = 120
-target-version = "py39"
+target-version = "py310"
 extend-exclude = ["site_scraper/amon_welcome.py"]
 
 [tool.ruff.lint]

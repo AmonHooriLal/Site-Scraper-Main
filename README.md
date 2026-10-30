@@ -4,7 +4,7 @@
 
 <p align="center">
   <a href="https://github.com/AmonHooriLal/Site-Scraper-Main/actions/workflows/ci.yml"><img src="https://github.com/AmonHooriLal/Site-Scraper-Main/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
-  <img src="https://img.shields.io/badge/python-3.9%2B-3776AB?logo=python&logoColor=white" alt="Python 3.9+">
+  <img src="https://img.shields.io/badge/python-3.10%2B-3776AB?logo=python&logoColor=white" alt="Python 3.10+">
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-22c55e" alt="MIT license"></a>
   <img src="https://img.shields.io/badge/status-beta-ffb050" alt="Beta">
 </p>
@@ -47,7 +47,7 @@ site-scraper https://example.com
 
 ## Install
 
-Requires Python 3.9 or newer.
+Requires Python 3.10 or newer.
 
 ```bash
 git clone https://github.com/AmonHooriLal/Site-Scraper-Main.git
