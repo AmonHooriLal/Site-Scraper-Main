@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url><loc>{{BASE}}/</loc></url>
+  <url><loc>{{BASE}}/blog/post-1.html</loc><lastmod>2026-01-10</lastmod></url>
+  <url><loc>{{BASE}}/blog/post-2.html</loc></url>
+  <url><loc>{{BASE}}/blog/post-2-copy.html</loc></url>
+  <url><loc>{{BASE}}/data/table.html</loc></url>
+  <url><loc>{{BASE}}/missing.html</loc></url>
+  <url><loc>{{BASE}}/private/secret.html</loc></url>
+</urlset>

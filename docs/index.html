@@ -1,0 +1,195 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Site Scraper Main</title>
+<meta name="description" content="Paste a website URL and get its public content as JSON, Markdown, CSV and Excel, with a live terminal dashboard. Open source, MIT.">
+<meta property="og:title" content="Site Scraper Main">
+<meta property="og:description" content="Paste a website URL, get its public content as JSON, Markdown, CSV and Excel.">
+<meta property="og:image" content="assets/social-preview.png">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>✦</text></svg>">
+<style>
+  :root {
+    --bg: #fbf8f4; --surface: #ffffff; --text: #1d1b26; --muted: #5d5a6b; --line: #e8e2da;
+    --accent: #e0557a; --accent-2: #f59e3a; --code-bg: #15161d; --code-text: #e8e6f0; --shadow: 0 10px 30px rgba(40,20,60,.08);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #12121a; --surface: #1b1b26; --text: #ecebf3; --muted: #a6a3b8; --line: #2b2a3a;
+      --accent: #ff7a9c; --accent-2: #ffb050; --code-bg: #0c0c12; --shadow: 0 10px 30px rgba(0,0,0,.35);
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #12121a; --surface: #1b1b26; --text: #ecebf3; --muted: #a6a3b8; --line: #2b2a3a;
+    --accent: #ff7a9c; --accent-2: #ffb050; --code-bg: #0c0c12; --shadow: 0 10px 30px rgba(0,0,0,.35);
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body { margin: 0; background: var(--bg); color: var(--text); line-height: 1.6;
+         font-family: "Segoe UI", system-ui, -apple-system, Roboto, sans-serif; }
+  a { color: var(--accent); }
+  .wrap { max-width: 1080px; margin: 0 auto; padding: 0 16px; }
+
+  /* hero */
+  .hero { position: relative; overflow: hidden; color: #fff; text-align: center; padding: 88px 0 140px;
+          background: linear-gradient(180deg, #1b1f3b 0%, #3d2a5c 34%, #c8546f 68%, #ffb050 88%, #ffe478 100%); }
+  .hero .sun { position: absolute; left: 50%; bottom: -40px; width: 300px; height: 300px; margin-left: -150px; border-radius: 50%;
+               background: radial-gradient(circle, #fff3c4 0%, #ffd56b 45%, rgba(255,176,80,0) 72%); }
+  .hero svg { position: absolute; left: 0; bottom: 0; width: 100%; height: 150px; }
+  .hero .inner { position: relative; }
+  .hero h1 { margin: 0; font-size: clamp(40px, 8vw, 84px); font-style: italic; font-weight: 800; letter-spacing: -1px;
+             background: linear-gradient(90deg, #ffe478, #ffb050, #ff708c, #c870eb, #78a5ff);
+             -webkit-background-clip: text; background-clip: text; color: transparent;
+             filter: drop-shadow(0 4px 18px rgba(0,0,0,.4)); }
+  .hero p { margin: 14px auto 0; max-width: 680px; font-size: clamp(17px, 2.4vw, 22px); color: #fff8ee;
+            text-shadow: 0 2px 10px rgba(0,0,0,.45); }
+  .buttons { margin-top: 30px; display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+  .btn { display: inline-block; padding: 12px 22px; border-radius: 999px; font-weight: 600; text-decoration: none; }
+  .btn.primary { background: #fff; color: #3d2a5c; box-shadow: 0 6px 20px rgba(0,0,0,.25); }
+  .btn.ghost { color: #fff; border: 1.5px solid rgba(255,255,255,.8); }
+  .theme { position: absolute; top: 16px; right: 16px; background: rgba(255,255,255,.15); color: #fff; border: 0;
+           border-radius: 999px; padding: 6px 12px; cursor: pointer; font: inherit; font-size: 14px; }
+
+  section { padding: 64px 0 8px; }
+  h2 { font-size: clamp(26px, 4vw, 34px); margin: 0 0 8px; }
+  .lead { color: var(--muted); margin: 0 0 28px; max-width: 720px; }
+
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; }
+  .card { background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 20px; box-shadow: var(--shadow); }
+  .card .icon { font-size: 26px; }
+  .card h3 { margin: 8px 0 6px; font-size: 18px; }
+  .card p { margin: 0; color: var(--muted); font-size: 15px; }
+
+  .shot { margin: 0 auto; max-width: 900px; border-radius: 14px; overflow: hidden; box-shadow: var(--shadow); border: 1px solid var(--line); }
+  .shot img { display: block; width: 100%; height: auto; }
+  .caption { text-align: center; color: var(--muted); font-size: 14px; margin-top: 10px; }
+
+  table { width: 100%; border-collapse: collapse; background: var(--surface); border-radius: 12px; overflow: hidden;
+          border: 1px solid var(--line); font-size: 15px; }
+  th, td { text-align: left; padding: 10px 14px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  th { background: color-mix(in srgb, var(--accent) 10%, var(--surface)); }
+  tr:last-child td { border-bottom: 0; }
+  .table-wrap { overflow-x: auto; }
+  code { font-family: "Cascadia Mono", Consolas, monospace; font-size: .92em; }
+  td code, p code, li code { background: color-mix(in srgb, var(--accent) 10%, transparent); padding: 1px 6px; border-radius: 6px; }
+
+  .code { position: relative; background: var(--code-bg); color: var(--code-text); border-radius: 12px; padding: 18px 20px;
+          overflow-x: auto; margin: 0 0 14px; }
+  .code pre { margin: 0; }
+  .copy { position: absolute; top: 10px; right: 10px; background: rgba(255,255,255,.1); color: var(--code-text); border: 0;
+          border-radius: 8px; padding: 4px 10px; cursor: pointer; font: inherit; font-size: 13px; }
+  .copy:hover { background: rgba(255,255,255,.2); }
+  .c { color: #8b8aa3; }
+
+  .note { border-left: 4px solid var(--accent-2); background: var(--surface); padding: 14px 18px; border-radius: 0 12px 12px 0;
+          border-top: 1px solid var(--line); border-right: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+  ul.clean { padding-left: 20px; margin: 0; }
+  ul.clean li { margin: 6px 0; }
+
+  footer { margin-top: 72px; padding: 28px 0 40px; border-top: 1px solid var(--line); color: var(--muted); text-align: center; font-size: 14px; }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <button class="theme" id="theme" aria-label="Toggle light and dark mode">◐ Theme</button>
+  <div class="sun"></div>
+  <svg viewBox="0 0 1280 150" preserveAspectRatio="none" aria-hidden="true">
+    <polygon fill="#5b3a78" opacity=".85" points="0,150 0,80 120,40 230,90 340,25 470,85 560,45 680,95 790,30 900,85 1010,40 1130,90 1280,45 1280,150"/>
+    <polygon fill="#3a2453" points="0,150 0,110 150,70 260,115 380,60 520,115 640,75 760,120 880,70 1000,115 1120,75 1280,110 1280,150"/>
+    <polygon fill="var(--bg)" points="0,150 0,135 200,108 360,138 540,112 700,140 860,115 1040,140 1200,118 1280,130 1280,150"/>
+  </svg>
+  <div class="wrap inner">
+    <h1>Site Scraper Main</h1>
+    <p>Paste a website URL. Get its public content back as clean, organised JSON, Markdown, CSV and Excel files, with a live dashboard while it runs.</p>
+    <div class="buttons">
+      <a class="btn primary" href="https://github.com/AmonHooriLal/Site-Scraper-Main">View on GitHub</a>
+      <a class="btn ghost" href="#quick-start">Quick start</a>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+  <section id="features">
+    <h2>What it does</h2>
+    <p class="lead">One command crawls a site from top to bottom, keeps only the real content, and saves it in formats you can open straight away.</p>
+    <div class="grid">
+      <div class="card"><div class="icon">🔎</div><h3>Finds every page</h3><p>Reads sitemaps and RSS feeds, then follows links, pagination and language versions.</p></div>
+      <div class="card"><div class="icon">🧠</div><h3>JavaScript sites too</h3><p>Pages that arrive empty are rendered in Edge or Chrome, and the JSON they load is saved.</p></div>
+      <div class="card"><div class="icon">🧹</div><h3>Clean text</h3><p>Main content only. Menus, footers, duplicate pages and "not found" pages are removed.</p></div>
+      <div class="card"><div class="icon">📊</div><h3>Tables and structured data</h3><p>Every data table as CSV, plus products, articles, FAQs, events and contact details.</p></div>
+      <div class="card"><div class="icon">🏗️</div><h3>Built for big sites</h3><p>SQLite state, resume after stopping, time, size and file limits, and crawler-trap protection.</p></div>
+      <div class="card"><div class="icon">🤝</div><h3>Polite and safe</h3><p>Honours robots.txt and rate limits, and stops when a site says no. Scraped content can't harm your PC.</p></div>
+    </div>
+  </section>
+
+  <section id="dashboard">
+    <h2>Watch it work</h2>
+    <p class="lead">A live dashboard shows each step with progress bars, speed, time left and the latest pages.</p>
+    <div class="shot"><img src="assets/dashboard.png" alt="Live terminal dashboard: finding pages done, crawling at 51%, counters and the latest pages" loading="lazy"></div>
+    <p class="caption">The dashboard during a crawl. It falls back to plain progress lines when output is redirected.</p>
+  </section>
+
+  <section id="quick-start">
+    <h2>Quick start</h2>
+    <p class="lead">Requires Python 3.9 or newer. JavaScript pages use the Edge or Chrome you already have.</p>
+    <div class="code"><button class="copy">Copy</button><pre><code>git clone https://github.com/AmonHooriLal/Site-Scraper-Main.git
+cd Site-Scraper-Main
+pip install -e ".[full]"
+site-scraper https://example.com</code></pre></div>
+    <div class="code"><button class="copy">Copy</button><pre><code><span class="c"># a few useful options</span>
+site-scraper https://example.com --max-pages 20000      <span class="c"># bigger sites</span>
+site-scraper https://example.com --sections blog,docs   <span class="c"># only some sections</span>
+site-scraper https://example.com --max-time 30m         <span class="c"># time-boxed</span>
+site-scraper https://example.com --resume               <span class="c"># continue later</span></code></pre></div>
+  </section>
+
+  <section id="output">
+    <h2>What you get</h2>
+    <p class="lead">Everything lands in one dated folder, <code>&lt;site&gt; Data YYYY-MM-DD</code>.</p>
+    <div class="table-wrap"><table>
+      <tr><th>File / folder</th><th>Contents</th></tr>
+      <tr><td><code>&lt;site&gt; Content.xlsx</code></td><td>Summary, all pages, a sheet per section and per structured-data type, tables, contacts, files and failures</td></tr>
+      <tr><td><code>pages.jsonl</code></td><td>One record per page: title, URL, date, author, tags, body (Markdown), headings, images, tables, structured data</td></tr>
+      <tr><td><code>markdown/</code></td><td>One readable file per page, grouped by section</td></tr>
+      <tr><td><code>tables/</code> · <code>structured/</code></td><td>Every data table as CSV; Schema.org records such as products, articles, FAQs and events</td></tr>
+      <tr><td><code>api/</code></td><td>JSON the site's pages loaded, plus embedded app state</td></tr>
+      <tr><td><code>documents/</code> · <code>images/</code></td><td>Downloaded files, with PDF text also saved as Markdown</td></tr>
+      <tr><td><code>contacts.json</code></td><td>Emails, phone numbers, social profiles and addresses, with the pages they came from</td></tr>
+    </table></div>
+  </section>
+
+  <section id="responsible-use">
+    <h2>Responsible use</h2>
+    <div class="note">
+      <ul class="clean">
+        <li>For <b>public</b> content you're allowed to use. Check each site's terms, and prefer an official API when one exists.</li>
+        <li>It follows robots.txt and rate-limits itself. When a site refuses access, it records that and stops. It never works around logins, captchas or bot protection.</li>
+        <li>If you keep the emails or phone numbers it collects, privacy laws such as the GDPR and India's DPDP Act apply. <code>--no-contacts</code> turns collection off.</li>
+      </ul>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">Created by Amon · MIT licence · <a href="https://github.com/AmonHooriLal/Site-Scraper-Main">GitHub</a></div>
+</footer>
+
+<script>
+  document.querySelectorAll(".copy").forEach(btn => btn.addEventListener("click", async () => {
+    const text = btn.parentElement.querySelector("code").innerText;
+    try { await navigator.clipboard.writeText(text); btn.textContent = "Copied"; }
+    catch (e) { btn.textContent = "Select & copy"; }
+    setTimeout(() => (btn.textContent = "Copy"), 1500);
+  }));
+  const root = document.documentElement, key = "ssm-theme";
+  try { const saved = localStorage.getItem(key); if (saved) root.dataset.theme = saved; } catch (e) {}
+  document.getElementById("theme").addEventListener("click", () => {
+    const dark = root.dataset.theme ? root.dataset.theme === "dark" : matchMedia("(prefers-color-scheme: dark)").matches;
+    root.dataset.theme = dark ? "light" : "dark";
+    try { localStorage.setItem(key, root.dataset.theme); } catch (e) {}
+  });
+</script>
+</body>
+</html>
